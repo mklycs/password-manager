@@ -1,0 +1,10 @@
+# Make sure to have these installed before using the password-manager:
+- sqlite3 libsqlite3-dev     -> the database where all service and their passwords are stored
+- xclip                      -> to copy the password to clipboard
+- libssl-dev                 -> necessary for hashing the masterpassword
+- sqlcipher libsqlcipher-dev -> to encrypt and decrypt the database
+
+to compile the programm use: cc main.c -lsqlcipher -lcrypto 
+
+## Brief description of the password-manager: 
+This program is creating a sqlite database to store to a service of the user a password that can be manually entered or randomly generated. To add services they have to be entered manually and they can be deleted. The passwords of the services can be copied to clipboard and changed. At the beginning the database will be decrypted and at the end encrypted with the key which is the masterpassword using sqlcipher. 
