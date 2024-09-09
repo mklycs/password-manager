@@ -219,6 +219,7 @@ def main():
     encrypt_file("dec-database.db", "database.db", hashed_masterpassword)
     encrypt_file("dec-database.db", "dec-database.db", hashed_masterpassword)
     os.remove("dec-database.db")
+    pyperclip.copy("")
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@
 - cryptography -> to use aes for the database encryption and decryption
 
 ## Brief description of the password-manager: 
-This program is creating a sqlite database to store to a service of the user a password that can be manually entered or randomly generated. To add services they have to be entered manually and they can be deleted. The passwords of the services can be copied to clipboard and changed. The database will be decrypted at the beginning by creating a new file, the database, where the decrypted content will be written into, and encrypted at the and of the programm with the up to date database. The old decrypted database file will be the encrypted and afterwards deleted.
+This program is creating a sqlite database to store to a service of the user a password that can be manually entered or randomly generated. To add services they have to be entered manually and they can be deleted. The passwords of the services can be changed and copied to clipboard where it is only available during the runtime of this program. The database will be decrypted at the beginning by creating a new file, the database, where the decrypted content will be written into, and encrypted at the and of the programm with the up to date database. The old decrypted database file will be the encrypted and afterwards deleted.
 
 ## Encryption explenation:
 - `iv = os.urandom(16)` 
