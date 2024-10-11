@@ -42,7 +42,7 @@
         system(command);                         // Execute the command 
     }
 #endif
-#define LEN 40
+#define LEN 20
 #define AES_BLOCK_SIZE 16
 
 void sha256(const char *str, char outputBuffer[65]){
@@ -124,7 +124,7 @@ unsigned int validateInput(const char *input){
     int number = 0; 
     int specialcharacter = 0;
 
-    for(int i = 0; i < strlen(input); i++){
+    for(size_t i = 0; i < strlen(input); i++){
         if((input[i] >= 97) && (input[i] <= 122))
             lowercase = 1;
 
@@ -272,7 +272,7 @@ void selectFrom(sqlite3 *db, unsigned int id){
     sqlite3_bind_int(stmt, 1, id);
     int rc = sqlite3_step(stmt);
     if(rc == SQLITE_ROW){
-        const unsigned char *password = sqlite3_column_text(stmt, 0);
+        const char *password = sqlite3_column_text(stmt, 0);
         copyToClipboard(password);
         printf("Password copied successfully to clipboard.\n");
     }else
@@ -295,7 +295,6 @@ void updatePassword(sqlite3 *db, int id, const char *password){
 }
 
 void copyPassword(sqlite3 *db){
-    getchar(); //to skip the annoying backslash buffer
     printf("Enter the numeric value of the service you would like to copy the password to clipboard.\n");
     int status = displayServices(db);
     if(status == 0)
@@ -305,7 +304,6 @@ void copyPassword(sqlite3 *db){
 }
 
 void addService(sqlite3 *db){
-    getchar(); //to skip the annoying backslash buffer
     printf("Enter the name of the service you would like to add: ");
     char service[LEN]; input(service, 0);
     int status = checkifServiceExist(db, service);
@@ -318,21 +316,19 @@ void addService(sqlite3 *db){
 }
 
 void changePassword(sqlite3 *db){
-    getchar(); //to skip the annoying backslash buffer
     printf("Enter the numeric value of the service you would like to change the password.\n");
     int status = displayServices(db);
     if(status == 0)
         return;
     int service; printf("Service id: "); scanf("%d", &service);
     
-    getchar(); //to skip the annoying backslash buffer
+    getchar(); //to skip backslash buffer
     char newPassword[LEN];
     enterPassword(newPassword, 0);
     updatePassword(db, service, newPassword);
 }
 
 void deleteService(sqlite3 *db){
-    getchar(); //to skip the annoying backslash buffer
     printf("Enter the numeric value of the service which you would like to delete.\n");
     int status = displayServices(db);
     if(status == 0)
@@ -342,7 +338,6 @@ void deleteService(sqlite3 *db){
 }
 
 void changeMasterpassword(){
-    getchar(); //to skip the annoying backslash buffer
     char masterpassword[LEN];
     enterPassword(masterpassword, 1);
 
@@ -405,6 +400,8 @@ int main(){
             printf("Only option 1-6 available.\n");
             continue;
         }
+
+        getchar(); //to skip backslash buffer
 
         if(choice == 1){
             copyPassword(db);

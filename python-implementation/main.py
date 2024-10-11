@@ -23,7 +23,7 @@ def generatePassword():
         generatedPassword += chr(randint(65, 90))
     
     temp = 0
-    for _ in range(36):
+    for _ in range(16):
         while 1:
             temp = randint(33, 126)
             if temp != 34 and temp != 39 and temp != 96:
@@ -38,35 +38,34 @@ def writeIntoFile(text):
     keyfile.close()
 
 def encrypt_file(input_file, output_file, key):
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    encryptor = cipher.encryptor()
+    iv = os.urandom(16)                                                            # random generates initialization vector of 16 bytes (128 bits), necessary for the aes mode cipher block chaining 
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend()) # creates an aes encryption object using the the masterpassword as the key and the previously generated initialization vector. default_backend() chooses the standard backend-cryptography implementation
+    encryptor = cipher.encryptor()                                                 # creates an encryption object which later will be used to encrypt data
 
-    with open(input_file, 'rb') as f:
-        plaintext = f.read()
-        padder = padding.PKCS7(algorithms.AES.block_size).padder()
-        padded_data = padder.update(plaintext) + padder.finalize()
+    with open(input_file, 'rb') as f:                              # opens the non encrypted database file to read in binary mode
+        plaintext = f.read()                                       # stores all file content in a variable
+        padder = padding.PKCS7(algorithms.AES.block_size).padder() # creates a padder object to pad the data according to the PKCS7 standard. This is necessary because aes can only process data blocks of a certain size (in this case 128 bits)
+        padded_data = padder.update(plaintext) + padder.finalize() # the data of the non encrypted database is padded with the padder. padder.update(plaintext) processes the data, and padder.finalize() adds the final padding to ensure that the data is aligned with the block size of aes
 
-    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize() # the padded data is being encrypted (.update()) with the encryption object created from earlier and then finalized (.finalize()) to ensure the completion of the encryption
 
-    with open(output_file, 'wb') as f:
-        f.write(iv) 
-        f.write(encrypted_data)
+    with open(output_file, 'wb') as f: # generates (if not exist) and opens a new file where the encrypted content will be written into
+        f.write(iv)                    # stores the initalization vector at the beginning, which will be later used for the encryption
+        f.write(encrypted_data)        # adds the encrypted content after the initializatin vector to the file
 
 def decrypt_file(input_file, output_file, key):
-    with open(input_file, 'rb') as f:
-        iv = f.read(16)  
-        encrypted_data = f.read()
+    with open(input_file, 'rb') as f: # opens the encrypted to read 
+        iv = f.read(16)               # reads the first 16 bytes from the file (which is the initalization vector) and stores it in a variable
+        encrypted_data = f.read()     # reads the encrypted content and saves it in a variable
 
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    decryptor = cipher.decryptor()
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend()) # creates an aes encryption object using the the masterpassword as the key and the previously read initialization vector. default_backend() chooses the standard backend-cryptography implementation
+    decryptor = cipher.decryptor()                                                 # creates an decryption object which later will be used to decrypt data
 
-    padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
+    padded_data = decryptor.update(encrypted_data) + decryptor.finalize() # decrypts (.update()) the encrypted conted of the read encrypted database file and the finalized finalized (.finalize()) to ensure the completion of the decryption
+    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()        # creates an unpadding object to remove the padding from the decrypted data
+    plaintext = unpadder.update(padded_data) + unpadder.finalize()        # removes the padding
 
-    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
-    plaintext = unpadder.update(padded_data) + unpadder.finalize()
-
-    with open(output_file, 'wb') as f:
+    with open(output_file, 'wb') as f: # generates and opens the new file to write the encrypted content into to be later be able to perform database operations
         f.write(plaintext)
 
 def createDatabase():
